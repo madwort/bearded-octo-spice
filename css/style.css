@@ -1,0 +1,49 @@
+body {
+	background: grey;
+	font-family: 'Open Sans', sans-serif;
+}
+h1 {
+	font-weight: 700;
+}
+h2 { 
+	font-size: 100%;
+	font-weight: 700;
+}
+ul#bookmarks {
+	list-style-type: none;
+}
+ul#bookmarks li {
+	
+}
+ul#options {
+	list-style-type: none;
+}
+
+div#sidebar {
+	float: left;
+	min-width: 300px;
+}
+div#map {
+   float: left;
+	width: 800px; 
+	height: 500px;
+	padding: 0;
+}
+a {
+	color: black;
+}
+a.active {
+	color: black;
+}
+a.external {
+	font-style: italic;
+   font-weight: 700;
+}
+div#timetables {
+   float: left;
+   clear: left;
+}
+div#timetables .server{
+   float: left;
+   width: 600px;
+}

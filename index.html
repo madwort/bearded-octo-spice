@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<head>
+	<title>Bearded Octo Spice! (A Leaflet map for TransportAPI)</title>
+	<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.2/leaflet.css" />
+	<link rel="stylesheet" href="css/style.css" />
+   <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css">
+ 	<link rel="stylesheet" href='http://fonts.googleapis.com/css?family=Open+Sans:400italic,400,300,700' type='text/css'>
+
+	<script src="http://cdn.leafletjs.com/leaflet-0.7.2/leaflet.js?2"></script>
+	<script src="js/jquery-2.1.0.js"></script>
+   <script src="js/jquery-ui-1.10.4.custom.js"></script>
+	<script src="js/map.js"></script>
+	
+</head>
+<body onload="initmap()">
+	<div id="sidebar">
+		<h1>Bearded Octo Spice</h1>
+		Currently only displays tram timetables
+		<div>
+			<h2>Location Bookmarks</h2>
+			<ul id="bookmarks">
+				<li><a href="#" onclick="map.setView({lat: 51.464167884073994,lng: -0.03664970397949219},15);">Brockley</a></li>
+				<li><a href="#" onclick="map.setView({lat: 51.50369393149093,lng: -0.08334159851074219},15)">London Bridge</a></li>
+				<li><a href="#" onclick="map.setView({lat: 53.38020539224545,lng: -1.4647865295410154},13)">Sheffield</a></li>
+				<li><a href="#" onclick="map.setView({lat: 53.79740645735382,lng: -3.037033081054687},13);">Blackpool</a></li>
+			</ul>
+		</div>
+		<div>
+			<h2>Timetable options</h2>
+			<ul id="options">
+				<li>Date: <input type="text" id="datepicker" value="01/27/2014"></li>
+				<li>Time: <input type="text" id="timepicker" value="Not used"></li>
+			</ul>
+		</div>
+		<div>
+			<h2>TransportAPI config</h2>
+			<ul id="options">
+				<li>API key: <input type="text" id="apikey" value="Invalid"></li>
+				<li>App ID: <input type="text" id="appid" value="Invalid"></li>
+			</ul>
+		</div>
+		<div>
+			<h2>Other</h2>		
+			<div>Developed by <a href="http://www.madwort.co.uk" class="external" target="_blank">Tom Ward</a></div>
+			<div>Using <a href="http://transportapi.com" class="external" target="_blank">TransportAPI</a>, 
+					<a href="http://leafletjs.com" class="external" target="_blank">LeafletJS</a>, 
+					<a href="http://jquery.com" class="external" target="_blank">JQuery</a>,
+					<a href="http://openstreetmap.org" class="external" target="_blank">OpenStreetMap</a>, 
+					etc
+			</div>
+		</div>	
+	</div>
+	<div id="map"></div>
+	<div id="timetables"><h2>Timetable</h2>
+		<div class="server" id="placr2">Placr2</div>
+		<div class="server" id="placr4">Placr4</div>
+	</div>
+	
+	
+</body>
+</html>
