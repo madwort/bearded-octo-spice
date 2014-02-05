@@ -17,10 +17,23 @@ function initmap() {
 	map.setView(new L.LatLng(51.4647560817196, -0.03664970397949219),15);
 	map.addLayer(osm);
 	
+   // Look for TransportAPI credentials in the browser's cookie
+   if($.cookie('api_key') !== undefined) {
+      $("#apikey")[0].value = $.cookie('api_key');
+   }
+   if($.cookie('app_id') !== undefined) {
+      $("#appid")[0].value = $.cookie('app_id');
+   }
+   
 	// call once to initiate, then call whenever you move the map
 	onMapMove();
 	map.on('moveend', onMapMove);
 
+}
+
+function storeApiKeyInCookies() {
+   $.cookie('api_key',$("#apikey")[0].value);
+   $.cookie('app_id',$("#appid")[0].value);
 }
 
 function getApiKey() {

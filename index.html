@@ -9,6 +9,7 @@
 	<script src="http://cdn.leafletjs.com/leaflet-0.7.2/leaflet.js?2"></script>
 	<script src="js/jquery-2.1.0.js"></script>
    <script src="js/jquery-ui-1.10.4.custom.js"></script>
+   <script src="js/jquery.cookie-1.4.0.js"></script>
 	<script src="js/map.js"></script>
 	
 </head>
@@ -37,6 +38,7 @@
 			<ul id="options">
 				<li>API key: <input type="text" id="apikey" value="Invalid"></li>
 				<li>App ID: <input type="text" id="appid" value="Invalid"></li>
+				<li><a href="#" onClick="storeApiKeyInCookies();">Store credentials in cookies</a></li>
 			</ul>
 		</div>
 		<div>
