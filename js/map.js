@@ -253,10 +253,11 @@ function askForTramStopsComparative() {
 
 function askForTubeStops() {
 	// request the marker info with AJAX for the current bounds
-	var center=map.getCenter();
+	var bounds=map.getBounds();
 	var url='http://transportapi.com/v3/uk/tube/stations/bbox.json?' +
-		 getApiKey()+ 
-		 center.lng+'&lat='+center.lat;
+		 getApiKey()+
+		 '&minlon='+bounds.getSouthWest().lng+'&minlat='+bounds.getSouthWest().lat+
+		 '&maxlon='+bounds.getNorthEast().lng+'&maxlat='+bounds.getNorthEast().lat;
 	// ajaxRequest.onreadystatechange = stateChanged;
 	// ajaxRequest.open('GET', msg, true);
 	// ajaxRequest.send(null);
@@ -271,10 +272,13 @@ function askForTubeStops() {
 		for (i=0;i<tubeStationList.length;i++) {
          if(tubeStationList[i].atcocode)
 			var tubeStationll = new L.LatLng(tubeStationList[i].latitude,tubeStationList[i].longitude, true);
-			var TubeStopMarker = new L.CircleMarker(tubeStationll, {fill: true, fillColor: "#F00"});
+         var tubeStationStatus = tubePerformance.filter(function (element) { return (element[0]=="TFL:"+tubeStationList[i].station_code);  } );
+			var TubeStopMarker = new L.CircleMarker(tubeStationll, 
+                                                {opacity: 1, color: tubeStationStatus[0][1], 
+                                                   fill: true, fillColor: tubeStationStatus[0][1], fillOpacity: 0.7});
 			TubeStopMarker.data=tubeStationList[i];
 			map.addLayer(TubeStopMarker);
-         // TubeStopMarker.bindPopup("<h3>"+tubeStationList[i].name+"</h3>"+tubeStationList[i].atcocode);
+         TubeStopMarker.bindPopup("<h3>Tube: "+tubeStationList[i].name+"</h3>"+tubeStationList[i].lines.join(", "));
          tubeStationLayers.push(TubeStopMarker);
 		}
 	});
@@ -282,7 +286,7 @@ function askForTubeStops() {
 
 function onMapMove(e) {
 	// askForBusStops();
-	askForTramStops();
+   // askForTramStops();
 	askForTubeStops();
    
 }
