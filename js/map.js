@@ -272,14 +272,18 @@ function askForTubeStops() {
 		for (i=0;i<tubeStationList.length;i++) {
          if(tubeStationList[i].atcocode)
 			var tubeStationll = new L.LatLng(tubeStationList[i].latitude,tubeStationList[i].longitude, true);
+         // alert(tubeStationList[i].station_code);
          var tubeStationStatus = tubePerformance.filter(function (element) { return (element[0]=="TFL:"+tubeStationList[i].station_code);  } );
-			var TubeStopMarker = new L.CircleMarker(tubeStationll, 
-                                                {opacity: 1, color: tubeStationStatus[0][1], 
-                                                   fill: true, fillColor: tubeStationStatus[0][1], fillOpacity: 0.7});
-			TubeStopMarker.data=tubeStationList[i];
-			map.addLayer(TubeStopMarker);
-         TubeStopMarker.bindPopup("<h3>Tube: "+tubeStationList[i].name+"</h3>"+tubeStationList[i].lines.join(", "));
-         tubeStationLayers.push(TubeStopMarker);
+         // slight issue with DLR stations being lower case (ie. "dlr:ban" breaking the next lines )
+         if (tubeStationStatus.length == 1) {
+            var TubeStopMarker = new L.CircleMarker(tubeStationll, 
+                                                   {opacity: 1, color: tubeStationStatus[0][1], 
+                                                      fill: true, fillColor: tubeStationStatus[0][1], fillOpacity: 0.7});
+   			TubeStopMarker.data=tubeStationList[i];
+   			map.addLayer(TubeStopMarker);
+            TubeStopMarker.bindPopup("<h3>Tube: "+tubeStationList[i].name+"</h3>"+tubeStationList[i].lines.join(", "));
+            tubeStationLayers.push(TubeStopMarker);
+         }
 		}
 	});
 }
