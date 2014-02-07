@@ -274,7 +274,7 @@ function askForTubeStops() {
 			var tubeStationll = new L.LatLng(tubeStationList[i].latitude,tubeStationList[i].longitude, true);
          // alert(tubeStationList[i].station_code);
          var tubeStationStatus = tubePerformance.filter(function (element) { return (element[0]=="TFL:"+tubeStationList[i].station_code);  } );
-         // slight issue with DLR stations being lower case (ie. "dlr:ban" breaking the next lines )
+         // slight issue with DLR stations breaking the next lines (ie. "DLR:ban") 
          if (tubeStationStatus.length == 1) {
             var TubeStopMarker = new L.CircleMarker(tubeStationll, 
                                                    {opacity: 1, color: tubeStationStatus[0][1], 
