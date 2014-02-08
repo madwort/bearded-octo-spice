@@ -2,9 +2,9 @@ var map;
 
 var busStopList;
 var busStopLayers = [];
-var tramStopList;
+var tramStopList = [];
 var tramStopLayers = [];
-var tubeStationList;
+var tubeStationList = [];
 var tubeStationLayers = [];
 
 var tubePerformance = [];
@@ -290,7 +290,7 @@ function askForTubeStops() {
 
 function onMapMove(e) {
 	// askForBusStops();
-   // askForTramStops();
+   askForTramStops();
 	askForTubeStops();
    
 }

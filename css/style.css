@@ -21,11 +21,13 @@ ul#options {
 
 div#sidebar {
 	float: left;
+   width: 33%;
 	min-width: 300px;
 }
 div#map {
    float: left;
-	width: 800px; 
+   width: 66%;
+	min-width: 600px; 
 	height: 500px;
 	padding: 0;
 }
@@ -45,5 +47,24 @@ div#timetables {
 }
 div#timetables .server{
    float: left;
-   width: 600px;
+   width: 50%;
+   min-width: 600px;
+}
+
+/* this is aimed at iPads with a width of 964*/
+@media screen and (max-width: 1000px) {
+   div#sidebar {
+      min-width: 300px;
+      width: 300px;
+   }
+   
+   div#map {
+      width: 600px;
+      height: 700px;
+   }
+   div#timetables .server{
+      float: left;
+      width: 50%;
+      min-width: 450px;
+   }
 }
