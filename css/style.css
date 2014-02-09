@@ -15,7 +15,7 @@ ul#bookmarks {
 ul#bookmarks li {
 	
 }
-ul#options {
+ul#options, ul#layers {
 	list-style-type: none;
 }
 
@@ -50,6 +50,20 @@ div#timetables .server{
    width: 50%;
    min-width: 600px;
 }
+
+div#footer {
+   margin-top: 20px;
+   border-top: 2px solid black;
+   width: 100%;
+   float: left;
+   clear: both;
+}
+
+.ui-button-text {
+   /* this is to set the font size for the jquery buttons for enabling transport layers */
+   font-size: 0.8em;
+}
+
 
 /* this is aimed at iPads with a width of 964*/
 @media screen and (max-width: 1000px) {

@@ -4,9 +4,10 @@ var busStopList;
 var busStopLayers = [];
 var tramStopList = [];
 var tramStopLayers = [];
+var tramLayerEnabled = true;
 var tubeStationList = [];
 var tubeStationLayers = [];
-
+var tubeLayerEnabled = true;
 var tubePerformance = [];
 
 function initmap() {
@@ -35,7 +36,30 @@ function initmap() {
 	map.on('moveend', onMapMove);
 
    addTubeRadar();
-
+   
+   $("#tram_timetables").button().click(function (event) {
+      if (tramLayerEnabled) {
+         // remove all tube markers
+         tramLayerEnabled = false;
+         removeTramMarkersAll();
+      } else {
+         tramLayerEnabled = true;
+         // add tube markers to current window
+         askForTramStops();
+      };
+   });
+   $("#tube_radar").button().click(function (event) {
+      if (tubeLayerEnabled) {
+         // remove all tube markers
+         tubeLayerEnabled = false;
+         removeTubeMarkers();
+      } else {
+         tubeLayerEnabled = true;
+         // add tube markers to current window
+         askForTubeStops();
+      }
+   });
+   
 }
 
 function storeApiKeyInCookies() {
@@ -61,6 +85,14 @@ function removeTubeMarkers() {
 	tubeStationLayers=[];
 }
 
+function removeTramMarkersAll() {
+	for (i=0;i<tramStopLayers.length;i++) {
+      map.removeLayer(tramStopLayers[i]);
+	}
+   tramStopLayers=[];
+}
+
+// this function only removes markers outside of the current map viewport - so we can add them as we go along
 function removeTramMarkers() {
 	for (i=0;i<tramStopLayers.length;i++) {
 		if(! map.getBounds().contains([tramStopLayers[i].data.latitude, tramStopLayers[i].data.longitude])) {
@@ -109,6 +141,9 @@ function askForTramStops() {
 
 function askForTramStopsPopup() {
 	// request the marker info with AJAX for the current bounds
+   
+   if(!tramLayerEnabled) { return null; }
+   
 	var bounds=map.getBounds();
 	var url='http://transportapi.com/v3/uk/tram/stops/bbox.json?' +
 		 getApiKey() + 
@@ -171,6 +206,9 @@ function askForTramStopsPopup() {
 
 function askForTramStopsComparative() {
 	// request the marker info with AJAX for the current bounds
+   
+   if(!tramLayerEnabled) { return null; }
+   
 	var bounds=map.getBounds();
 	var url='http://transportapi.com/v3/uk/tram/stops/bbox.json?' +
 		 getApiKey() + 
@@ -253,6 +291,8 @@ function askForTramStopsComparative() {
 
 function askForTubeStops() {
 	// request the marker info with AJAX for the current bounds
+   if(!tubeLayerEnabled) { return null; }
+   
 	var bounds=map.getBounds();
 	var url='http://transportapi.com/v3/uk/tube/stations/bbox.json?' +
 		 getApiKey()+

@@ -17,7 +17,6 @@
 	<div id="container">	
 		<div id="sidebar">
 			<h1>Bearded Octo Spice</h1>
-			Currently only displays tram timetables
 			<div>
 				<h2>Location Bookmarks</h2>
 				<ul id="bookmarks">
@@ -31,7 +30,14 @@
 				<h2>Timetable options</h2>
 				<ul id="options">
 					<li>Date: <input type="text" id="datepicker" value="01/27/2014"></li>
-					<li>Time: <input type="text" id="timepicker" value="Not used"></li>
+					<!-- <li>Time: <input type="text" id="timepicker" value="Not used"></li> -->
+				</ul>
+			</div>
+			<div>
+				<h2>Layer options</h2>
+				<ul id="layers">
+					<li><label for="tram_timetables">Tram timetables</label><input type="checkbox" value="1" id="tram_timetables"></li>
+					<li><label for="tube_radar">Tube radar</label><input type="checkbox" value="1" id="tube_radar"></li>
 				</ul>
 			</div>
 			<div>
@@ -42,16 +48,6 @@
 					<li><a href="#" onClick="storeApiKeyInCookies();">Store credentials in cookies</a></li>
 				</ul>
 			</div>
-			<div>
-				<h2>Other</h2>		
-				<div>Developed by <a href="http://www.madwort.co.uk" class="external" target="_blank">Tom Ward</a></div>
-				<div>Using <a href="http://transportapi.com" class="external" target="_blank">TransportAPI</a>, 
-						<a href="http://leafletjs.com" class="external" target="_blank">LeafletJS</a>, 
-						<a href="http://jquery.com" class="external" target="_blank">JQuery</a>,
-						<a href="http://openstreetmap.org" class="external" target="_blank">OpenStreetMap</a>, 
-						etc
-				</div>
-			</div>	
 		</div>
 		<div id="map"></div>
 	</div>
@@ -59,6 +55,15 @@
 		<div class="server" id="placr2">Placr2</div>
 		<div class="server" id="placr4">Placr4</div>
 	</div>
+	<div id="footer">
+		<div>Developed by <a href="http://www.madwort.co.uk" class="external" target="_blank">Tom Ward</a></div>
+		<div>Using <a href="http://transportapi.com" class="external" target="_blank">TransportAPI</a>, 
+				<a href="http://leafletjs.com" class="external" target="_blank">LeafletJS</a>, 
+				<a href="http://jquery.com" class="external" target="_blank">JQuery</a>,
+				<a href="http://openstreetmap.org" class="external" target="_blank">OpenStreetMap</a>, 
+				etc
+		</div>
+	</div>	
 	
 	
 </body>
