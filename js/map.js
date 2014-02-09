@@ -52,7 +52,7 @@ function initmap() {
       if (tubeLayerEnabled) {
          // remove all tube markers
          tubeLayerEnabled = false;
-         removeTubeMarkers();
+         removeTubeMarkersAll();
       } else {
          tubeLayerEnabled = true;
          // add tube markers to current window
@@ -78,13 +78,24 @@ function removeBusMarkers() {
 	busStopLayers=[];
 }
 
-function removeTubeMarkers() {
+// refactor this into the following function at some point
+function removeTubeMarkersAll() {
 	for (i=0;i<tubeStationLayers.length;i++) {
 		map.removeLayer(tubeStationLayers[i]);
 	}
 	tubeStationLayers=[];
 }
 
+function removeTubeMarkers() {
+	for (i=0;i<tubeStationLayers.length;i++) {
+		if(! map.getBounds().contains([tubeStationLayers[i].data.latitude, tubeStationLayers[i].data.longitude])) {
+   		map.removeLayer(tubeStationLayers[i]);
+         tubeStationLayers.splice(i,1);
+      }
+	}
+}
+
+// refactor this duplication to cover all transport modes at some point
 function removeTramMarkersAll() {
 	for (i=0;i<tramStopLayers.length;i++) {
       map.removeLayer(tramStopLayers[i]);
@@ -204,16 +215,21 @@ function askForTramStopsPopup() {
 
 }
 
-function askForTramStopsComparative() {
+
+function askForTramStopsComparative(page) {
 	// request the marker info with AJAX for the current bounds
    
    if(!tramLayerEnabled) { return null; }
-   
+
+   // set default value for page = 1
+   page = typeof page !== 'undefined' ? page : 1;
+
 	var bounds=map.getBounds();
 	var url='http://transportapi.com/v3/uk/tram/stops/bbox.json?' +
 		 getApiKey() + 
 		 '&minlon='+bounds.getSouthWest().lng+'&minlat='+bounds.getSouthWest().lat+
-		 '&maxlon='+bounds.getNorthEast().lng+'&maxlat='+bounds.getNorthEast().lat;
+		 '&maxlon='+bounds.getNorthEast().lng+'&maxlat='+bounds.getNorthEast().lat+
+       '&page='+page;
 	// ajaxRequest.onreadystatechange = stateChanged;
 	// ajaxRequest.open('GET', msg, true);
 	// ajaxRequest.send(null);
@@ -222,82 +238,95 @@ function askForTramStopsComparative() {
        url: url,
        data: {},
        dataType: 'jsonp'
-   }).done(function (data) {
-		tramStopList=data.stops;
-		removeTramMarkers();
-      var duplicateStop = false;
-		for (i=0;i<tramStopList.length;i++) {
-         duplicateStop = false;
-         // we should be able to do better than iterating through all markers, but this will work for now... 
-         // (given small numbers of markers!)
-         // may be better to have an index by atcocode so we can just look this up (more memory, less cpu)
-         for (var j = 0; j < tramStopLayers.length; j++) {
-            if (tramStopLayers[j].data.atcocode == tramStopList[i].atcocode){
-               duplicateStop = true;
-            }
-         }
-         if(!duplicateStop) {
-            var tramStopll = new L.LatLng(tramStopList[i].latitude,tramStopList[i].longitude, true);
-   			var tramStopMarker = new L.Marker(tramStopll);
-   			tramStopMarker.data=tramStopList[i];
-   			map.addLayer(tramStopMarker);
-   			// tramStopMarker.bindPopup("<h3>"+tramStopList[i].name+"</h3>"+tramStopList[i].atcocode);
-   			tramStopMarker.on('click',function(e) {
-               var myDate = $( "#datepicker" ).datepicker("getDate");
-   				$.ajax({
-   					url: 'http://2.placr.co.uk/v3/uk/tram/stop/'+e.target.data.atcocode+'/'+
-                     // myDate.getMonth() not working for some reason...
-                     myDate.getFullYear()+'-'+'01'+'-'+myDate.getDate()+
-                     '/12:00/timetable.json?' +
-   						getApiKey() + '&group=no&limit=3', 
-   					data: {},
-   					dataType: 'jsonp'
-   					}).done(function(data) {
-   						var departures = '';
-   						for (var i = 0; i < data.departures.all.length; i++) {
-   							departures += data.departures.all[i].direction + ' - ';
-   							departures += data.departures.all[i].aimed_departure_time + '<br />';
-   						}
-                     $( "div#placr2").replaceWith('<div class="server" id="placr2"><h2>Placr2</h2><h3>'
-                         +e.target.data.name+' at '+data.request_time+'</h3>' + '<br />' + departures+'</div>');
-   					});
-
-   				$.ajax({
-   					url: 'http://4.placr.co.uk/v3/uk/tram/stop/'+e.target.data.atcocode+'/'+
-                     // myDate.getMonth() not working for some reason...
-                     myDate.getFullYear()+'-'+'01'+'-'+myDate.getDate()+
-                     '/12:00/timetable.json?' +
-   						getApiKey() + '&group=no&limit=3', 
-   					data: {},
-   					dataType: 'jsonp'
-   					}).done(function(data) {
-   						var departures = '';
-   						for (var i = 0; i < data.departures.all.length; i++) {
-   							departures += data.departures.all[i].direction + ' - ';
-   							departures += data.departures.all[i].aimed_departure_time + '<br />';
-   						}
-                     $( "div#placr4").replaceWith('<div class="server" id="placr4"><h2>Placr4</h2><h3>'
-                        +e.target.data.name+' at '+data.request_time+'</h3>' + '<br />' + departures+'</div>');
-   					});
-            
-                  
-   				});
-   			tramStopLayers.push(tramStopMarker);
-         }
-		}
-	});
+   }).done(tramStopHandler);
 
 }
 
-function askForTubeStops() {
+
+function tramStopHandler(data) {
+   // check whether layer has been disabled while we were waiting for a response from the API
+   if (!tramLayerEnabled) { return null; }
+   
+	tramStopList=data.stops;
+   if (data.total > (data.page*data.rpp)) { 
+      askForTramStopsComparative(data.page + 1);
+   }
+	removeTramMarkers();
+   var duplicateStop = false;
+	for (i=0;i<tramStopList.length;i++) {
+      duplicateStop = false;
+      // we should be able to do better than iterating through all markers, but this will work for now... 
+      // (given small numbers of markers!)
+      // may be better to have an index by atcocode so we can just look this up (more memory, less cpu)
+      for (var j = 0; j < tramStopLayers.length; j++) {
+         if (tramStopLayers[j].data.atcocode == tramStopList[i].atcocode){
+            duplicateStop = true;
+         }
+      }
+      if(!duplicateStop) {
+         var tramStopll = new L.LatLng(tramStopList[i].latitude,tramStopList[i].longitude, true);
+			var tramStopMarker = new L.Marker(tramStopll);
+			tramStopMarker.data=tramStopList[i];
+			map.addLayer(tramStopMarker);
+			// tramStopMarker.bindPopup("<h3>"+tramStopList[i].name+"</h3>"+tramStopList[i].atcocode);
+			tramStopMarker.on('click',function(e) {
+            var myDate = $( "#datepicker" ).datepicker("getDate");
+				$.ajax({
+					url: 'http://2.placr.co.uk/v3/uk/tram/stop/'+e.target.data.atcocode+'/'+
+                  // myDate.getMonth() not working for some reason...
+                  myDate.getFullYear()+'-'+'01'+'-'+myDate.getDate()+
+                  '/12:00/timetable.json?' +
+						getApiKey() + '&group=no&limit=3', 
+					data: {},
+					dataType: 'jsonp'
+					}).done(function(data) {
+						var departures = '';
+						for (var i = 0; i < data.departures.all.length; i++) {
+							departures += data.departures.all[i].direction + ' - ';
+							departures += data.departures.all[i].aimed_departure_time + '<br />';
+						}
+                  $( "div#placr2").replaceWith('<div class="server" id="placr2"><h2>Placr2</h2><h3>'
+                      +e.target.data.name+' at '+data.request_time+'</h3>' + '<br />' + departures+'</div>');
+					});
+
+				$.ajax({
+					url: 'http://4.placr.co.uk/v3/uk/tram/stop/'+e.target.data.atcocode+'/'+
+                  // myDate.getMonth() not working for some reason...
+                  myDate.getFullYear()+'-'+'01'+'-'+myDate.getDate()+
+                  '/12:00/timetable.json?' +
+						getApiKey() + '&group=no&limit=3', 
+					data: {},
+					dataType: 'jsonp'
+					}).done(function(data) {
+						var departures = '';
+						for (var i = 0; i < data.departures.all.length; i++) {
+							departures += data.departures.all[i].direction + ' - ';
+							departures += data.departures.all[i].aimed_departure_time + '<br />';
+						}
+                  $( "div#placr4").replaceWith('<div class="server" id="placr4"><h2>Placr4</h2><h3>'
+                     +e.target.data.name+' at '+data.request_time+'</h3>' + '<br />' + departures+'</div>');
+					});
+         
+               
+				});
+			tramStopLayers.push(tramStopMarker);
+      }
+	}
+};
+
+function askForTubeStops(page) {
 	// request the marker info with AJAX for the current bounds
    if(!tubeLayerEnabled) { return null; }
+   
+   // set default value for page = 1
+   page = typeof page !== 'undefined' ? page : 1;
    
 	var bounds=map.getBounds();
 	var url='http://transportapi.com/v3/uk/tube/stations/bbox.json?' +
 		 getApiKey()+
 		 '&minlon='+bounds.getSouthWest().lng+'&minlat='+bounds.getSouthWest().lat+
-		 '&maxlon='+bounds.getNorthEast().lng+'&maxlat='+bounds.getNorthEast().lat;
+		 '&maxlon='+bounds.getNorthEast().lng+'&maxlat='+bounds.getNorthEast().lat+
+       '&page='+page;
 	// ajaxRequest.onreadystatechange = stateChanged;
 	// ajaxRequest.open('GET', msg, true);
 	// ajaxRequest.send(null);
@@ -306,12 +335,33 @@ function askForTubeStops() {
        url: url,
        data: {},
        dataType: 'jsonp'
-   }).done(function (data) {
-		tubeStationList=data.stations;
-		removeTubeMarkers();
-		for (i=0;i<tubeStationList.length;i++) {
-         if(tubeStationList[i].atcocode)
-			var tubeStationll = new L.LatLng(tubeStationList[i].latitude,tubeStationList[i].longitude, true);
+   }).done(tubeStationHandler);
+}
+
+function tubeStationHandler(data) {
+   if (!tubeLayerEnabled) { return null; }
+
+   if (data.total > (data.page*data.rpp)) { 
+      askForTubeStops(data.page + 1);
+   }
+
+	tubeStationList=data.stations;
+	removeTubeMarkers();
+   var duplicateStop = false;
+	for (i=0;i<tubeStationList.length;i++) {
+      duplicateStop = false;
+
+      // we should be able to do better than iterating through all markers, but this will work for now... 
+      // (given small numbers of markers!)
+      // may be better to have an index by atcocode so we can just look this up (more memory, less cpu)
+      for (var j = 0; j < tubeStationLayers.length; j++) {
+         if (tubeStationLayers[j].data.atcocode == tubeStationList[i].atcocode){
+            duplicateStop = true;
+         }
+      }
+
+      if(!duplicateStop) {
+ 			var tubeStationll = new L.LatLng(tubeStationList[i].latitude,tubeStationList[i].longitude, true);
          // alert(tubeStationList[i].station_code);
          var tubeStationStatus = tubePerformance.filter(function (element) { return (element[0]=="TFL:"+tubeStationList[i].station_code);  } );
          // slight issue with DLR stations breaking the next lines (ie. "DLR:ban") 
@@ -324,8 +374,8 @@ function askForTubeStops() {
             TubeStopMarker.bindPopup("<h3>Tube: "+tubeStationList[i].name+"</h3>"+tubeStationList[i].lines.join(", "));
             tubeStationLayers.push(TubeStopMarker);
          }
-		}
-	});
+      }
+	}
 }
 
 function onMapMove(e) {
