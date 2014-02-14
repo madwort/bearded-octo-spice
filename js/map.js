@@ -48,6 +48,11 @@ function initmap() {
          askForTramStops();
       };
    });
+
+
+   // default state is on, this click switches off
+   $("#tram_timetables").button().click();
+
    $("#tube_radar").button().click(function (event) {
       if (tubeLayerEnabled) {
          // remove all tube markers
